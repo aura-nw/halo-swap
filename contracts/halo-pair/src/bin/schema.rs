@@ -7,6 +7,6 @@ fn main() {
         instantiate: InstantiateMsg,
         migrate: MigrateMsg,
         execute: ExecuteMsg,
-        query: QueryMsg,
+        // query: QueryMsg,
     }
 }

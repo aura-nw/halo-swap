@@ -1,7 +1,7 @@
 pub mod contract;
 mod error;
 pub mod msg;
-pub mod state;
+pub mod pair;
 pub mod asset;
 pub mod swap;
 pub mod liquidity;
