@@ -48,7 +48,6 @@ schemars = "0.8.11"
 serde = { version = "1.0.147", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.37" }
 halo-token = { version = "0.1.0", path = "../halo-token" }
-halo-factory = { version = "0.1.0", path = "../halo-factory" }
 cosmwasm-bignumber = { version = "0.1.0", path = "../../packages/bignumber" }
 integer-sqrt = "0.1.5"
 

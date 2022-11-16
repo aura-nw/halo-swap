@@ -37,6 +37,6 @@ pub enum MigrateMsg {}
 #[cw_serde]
 pub enum QueryMsg {
     NativeTokenDecimals {
-        denom: String,
+        _denom: String,
     },
 }

@@ -2,13 +2,15 @@
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{
     to_binary, Addr, Api, BankMsg, BalanceResponse, BankQuery, CanonicalAddr, Coin, CosmosMsg, 
-    MessageInfo, QuerierWrapper, StdError, StdResult, SubMsg, Uint128, WasmMsg, QueryRequest, WasmQuery, Deps
+    MessageInfo, QuerierWrapper, StdError, StdResult, SubMsg, Uint128, WasmMsg, QueryRequest, WasmQuery, Deps, Storage
 };
+use cw_storage_plus::Map;
 use std::fmt;
 use crate::msg::QueryMsg;
 use cw20::{BalanceResponse as Cw20BalanceResponse, Cw20QueryMsg, TokenInfoResponse, Cw20ExecuteMsg};
 
-use halo_factory::state::ALLOW_NATIVE_TOKENS;
+// TODO: Add function to switch status of ALLOW_NATIVE_TOKENS
+pub const ALLOW_NATIVE_TOKENS: Map<&[u8], u8> = Map::new("allow_native_token");
 
 #[cw_serde]
 pub struct NativeTokenDecimalsResponse {
@@ -286,7 +288,7 @@ pub fn query_native_decimals(
     let res: NativeTokenDecimalsResponse =
         querier.query(&QueryRequest::Wasm(WasmQuery::Smart {
             contract_addr: factory_contract.to_string(),
-            msg: to_binary(&QueryMsg::NativeTokenDecimals { denom })?,
+            msg: to_binary(&QueryMsg::NativeTokenDecimals { _denom: denom })?,
         }))?;
     Ok(res.decimals)
 }
@@ -312,3 +314,21 @@ pub fn query_native_token_decimal(
 
     Ok(NativeTokenDecimalsResponse { decimals })
 }
+
+pub fn pair_key(asset_infos: &[AssetInfoRaw; 2]) -> Vec<u8> {
+    let mut asset_infos = asset_infos.to_vec();
+    asset_infos.sort_by(|a, b| a.as_bytes().cmp(b.as_bytes()));
+
+    [asset_infos[0].as_bytes(), asset_infos[1].as_bytes()].concat()
+}
+
+// key : asset info / value: decimals
+// pub const ALLOW_NATIVE_TOKENS: Map<&[u8], u8> = Map::new("allow_native_token");
+pub fn add_allow_native_token(
+    storage: &mut dyn Storage,
+    denom: String,
+    decimals: u8,
+) -> StdResult<()> {
+    ALLOW_NATIVE_TOKENS.save(storage, denom.as_bytes(), &decimals)
+}
+

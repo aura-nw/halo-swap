@@ -123,7 +123,7 @@ pub fn execute(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::NativeTokenDecimals { denom } => {
+        QueryMsg::NativeTokenDecimals { _denom } => {
             // to_binary(&query_native_token_decimal(deps, denom)?)
             // return default response
             Ok(Binary::from(b"0".to_vec()))
@@ -365,30 +365,28 @@ pub fn swap_from_native(
         ask_decimal,
     )?;
 
-    // // The pair call Swap function and address 'to' will be the current pair contract address until the last operation
-    // let receiver = to.unwrap_or_else(|| sender.clone());
+    // The pair call Swap function and address 'to' will be the current pair contract address until the last operation
+    let receiver = to.unwrap_or_else(|| sender.clone());
 
-    // let mut messages: Vec<CosmosMsg> = vec![];
-    // if !return_amount.is_zero() {
-    //     messages.push(return_asset.into_msg(receiver.clone())?);
-    // }
+    let mut messages: Vec<CosmosMsg> = vec![];
+    if !return_amount.is_zero() {
+        messages.push(return_asset.into_msg(receiver.clone())?);
+    }
 
-    // // 1. send collateral token from the contract to a user
-    // // 2. send inactive commission to collector
-    // Ok(Response::new().add_messages(messages).add_attributes(vec![
-    //     ("action", "swap"),
-    //     ("sender", sender.as_str()),
-    //     ("receiver", receiver.as_str()),
-    //     ("offer_asset", &offer_asset.info.to_string()),
-    //     ("ask_asset", &ask_pool.info.to_string()),
-    //     ("offer_amount", &offer_amount.to_string()),
-    //     ("return_amount", &return_amount.to_string()),
-    //     ("spread_amount", &spread_amount.to_string()),
-    //     ("commission_amount", &commission_amount.to_string()),
-    // ]))
+    // 1. send collateral token from the contract to a user
+    // 2. send inactive commission to collector
+    Ok(Response::new().add_messages(messages).add_attributes(vec![
+        ("action", "swap"),
+        ("sender", sender.as_str()),
+        ("receiver", receiver.as_str()),
+        ("offer_asset", &offer_asset.info.to_string()),
+        ("ask_asset", &ask_pool.info.to_string()),
+        ("offer_amount", &offer_amount.to_string()),
+        ("return_amount", &return_amount.to_string()),
+        ("spread_amount", &spread_amount.to_string()),
+        ("commission_amount", &commission_amount.to_string()),
+    ]))
 
-    // return default response
-    Ok(Response::default())
 }
 
 // User want to swap from 'offer' to 'ask'

@@ -8,6 +8,14 @@ use crate::asset::{Asset, AssetInfo, AssetInfoRaw};
 pub const PAIR_INFO: Item<PairInfoRaw> = Item::new("pair_info");
 pub const COMMISSION_RATE: &str = "0.003";
 
+#[cw_serde]
+pub struct MigrateMsg {}
+
+#[cw_serde]
+pub struct PairsResponse {
+    pub pairs: Vec<PairInfo>,
+}
+
 // We define a custom struct for each query response
 #[cw_serde]
 pub struct PairInfo {
