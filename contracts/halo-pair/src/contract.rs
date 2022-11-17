@@ -88,7 +88,7 @@ pub fn execute(
         // // this message is ONLY used when swapping from a cw20 token to another cw20 token
         // ExecuteMsg::Receive(msg) => receive_cw20(deps, env, info, msg),
         // // this message is ONLY used when swapping from native token to cw20 token
-        ExecuteMsg::SwapFromNative {
+        ExecuteMsg::Swap {
             offer_asset,
             belief_price,
             max_spread,
@@ -106,7 +106,7 @@ pub fn execute(
                 None
             };
 
-            swap_from_native(
+            swap(
                 deps,
                 env,
                 info.clone(),
@@ -284,7 +284,7 @@ fn assert_slippage_tolerance(
 }
 
 // Function swap from native token to token
-pub fn swap_from_native(
+pub fn swap(
     deps: DepsMut,
     env: Env,
     info: MessageInfo,

@@ -23,7 +23,7 @@ pub enum ExecuteMsg {
         receiver: Option<String>,
     },
     /// Swap an offer asset to the other
-    SwapFromNative {
+    Swap {
         offer_asset: Asset,
         belief_price: Option<Decimal>,
         max_spread: Option<Decimal>,
