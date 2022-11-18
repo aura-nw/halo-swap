@@ -49,8 +49,8 @@ cw20 = "0.16.0"
 schemars = "0.8.8"
 serde = { version = "1.0.137", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.31" }
-halo-pair = { version = "0.1.0", path = "../halo-pair" }
-halo-factory = { version = "0.1.0", path = "../halo-factory" }
+halo-pair = { version = "0.1.0", path = "../halo-pair", features = ["library"] }
+halo-factory = { version = "0.1.0", path = "../halo-factory", features = ["library"] }
 
 [dev-dependencies]
 cw-multi-test = "0.16.0"

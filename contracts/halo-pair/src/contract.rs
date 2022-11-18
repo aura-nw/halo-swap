@@ -8,7 +8,7 @@ use crate::pair::{ PairInfoRaw, PAIR_INFO, COMMISSION_RATE };
 use crate::asset::{Asset, AssetInfo, query_token_info};
 
 use cosmwasm_std::{
-    Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult, to_binary, Decimal,
+    Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, Decimal,
     CanonicalAddr, SubMsg, WasmMsg, ReplyOn, Uint128, CosmosMsg, StdError, Addr
 };
 use halo_token::msg::InstantiateMsg as TokenInstantiateMsg;
@@ -129,12 +129,6 @@ pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
             Ok(Binary::from(b"0".to_vec()))
         }
     }
-}
-
-#[cfg_attr(not(feature = "library"), entry_point)]
-pub fn reply(_deps: DepsMut, _env: Env, _msg: Reply) -> Result<Response, ContractError> {
-
-    todo!()
 }
 
 pub fn provide_liquidity(

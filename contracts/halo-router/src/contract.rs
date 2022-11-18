@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Addr, Api, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult, StdError, CosmosMsg, QuerierWrapper, QueryRequest, WasmQuery, to_binary, Decimal, WasmMsg, Coin, Uint128, from_binary};
+use cosmwasm_std::{Addr, Api, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, StdError, CosmosMsg, QuerierWrapper, QueryRequest, WasmQuery, to_binary, Decimal, WasmMsg, Coin, Uint128, from_binary};
 use cw2::set_contract_version;
 use cw20::{Cw20ExecuteMsg, Cw20ReceiveMsg};
 use halo_pair::asset::{AssetInfo, query_balance, query_token_balance, Asset};
@@ -97,12 +97,6 @@ pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         
     }
-}
-
-#[cfg_attr(not(feature = "library"), entry_point)]
-pub fn reply(_deps: DepsMut, _env: Env, _msg: Reply) -> Result<Response, ContractError> {
-
-    todo!()
 }
 
 fn optional_addr_validate(api: &dyn Api, addr: Option<String>) -> StdResult<Option<Addr>> {

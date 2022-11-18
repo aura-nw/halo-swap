@@ -1,6 +1,6 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Order, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult, StdError, SubMsg, WasmMsg, CosmosMsg, to_binary, ReplyOn, Storage, Api};
+use cosmwasm_std::{Order, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, StdError, SubMsg, WasmMsg, CosmosMsg, to_binary, ReplyOn, Storage, Api};
 use cw2::set_contract_version;
 use cw_storage_plus::Bound;
 use halo_pair::asset::{AssetInfo, query_balance, pair_key, add_allow_native_token, AssetInfoRaw};
@@ -65,12 +65,6 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         //     to_binary(&query_native_token_decimal(deps, denom)?)
         // }
     }
-}
-
-#[cfg_attr(not(feature = "library"), entry_point)]
-pub fn reply(_deps: DepsMut, _env: Env, _msg: Reply) -> Result<Response, ContractError> {
-
-    todo!()
 }
 
 // Only owner can execute it
