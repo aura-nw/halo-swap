@@ -7,8 +7,8 @@ use cw20::{
     AllAccountsResponse, AllAllowancesResponse, AllowanceResponse, BalanceResponse,
     TokenInfoResponse,
 };
-use cw20_base::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use halo_token::msg::InstantiateMsg as HaloInstantiateMsg;
+use cw20_base::msg::{ExecuteMsg as Cw20BaseExecuteMsg, InstantiateMsg as Cw20BaseInstantiateMsg, QueryMsg as Cw20BaseQueryMsg};
+use halo_token::msg::InstantiateMsg;
 
 fn main() {
     let mut out_dir = current_dir().unwrap();
@@ -16,10 +16,10 @@ fn main() {
     create_dir_all(&out_dir).unwrap();
     remove_schemas(&out_dir).unwrap();
 
-    export_schema(&schema_for!(HaloInstantiateMsg), &out_dir);
     export_schema(&schema_for!(InstantiateMsg), &out_dir);
-    export_schema(&schema_for!(ExecuteMsg), &out_dir);
-    export_schema(&schema_for!(QueryMsg), &out_dir);
+    export_schema(&schema_for!(Cw20BaseInstantiateMsg), &out_dir);
+    export_schema(&schema_for!(Cw20BaseExecuteMsg), &out_dir);
+    export_schema(&schema_for!(Cw20BaseQueryMsg), &out_dir);
     export_schema(&schema_for!(AllowanceResponse), &out_dir);
     export_schema(&schema_for!(BalanceResponse), &out_dir);
     export_schema(&schema_for!(TokenInfoResponse), &out_dir);
