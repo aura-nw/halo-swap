@@ -27,6 +27,7 @@ incremental = false
 overflow-checks = true
 
 [features]
+default = []
 # for more explicit tests, cargo test --features=backtraces
 backtraces = ["cosmwasm-std/backtraces"]
 # use library feature to disable all instantiate/execute/query exports
@@ -48,6 +49,7 @@ cw2 = "0.16.0"
 schemars = "0.8.11"
 serde = { version = "1.0.147", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.37" }
+halo-pair = { version = "0.1.0", path = "../halo-pair", features = ["library"] }
 
 [dev-dependencies]
 cw-multi-test = "0.16.0"
