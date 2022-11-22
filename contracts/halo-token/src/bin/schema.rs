@@ -7,7 +7,7 @@ use cw20::{
     AllAccountsResponse, AllAllowancesResponse, AllowanceResponse, BalanceResponse,
     TokenInfoResponse,
 };
-use cw20_base::msg::{ExecuteMsg as Cw20BaseExecuteMsg, InstantiateMsg as Cw20BaseInstantiateMsg, QueryMsg as Cw20BaseQueryMsg};
+use cw20_base::msg::{ExecuteMsg as Cw20BaseExecuteMsg, QueryMsg as Cw20BaseQueryMsg};
 use halo_token::msg::InstantiateMsg;
 
 fn main() {
@@ -17,7 +17,6 @@ fn main() {
     remove_schemas(&out_dir).unwrap();
 
     export_schema(&schema_for!(InstantiateMsg), &out_dir);
-    export_schema(&schema_for!(Cw20BaseInstantiateMsg), &out_dir);
     export_schema(&schema_for!(Cw20BaseExecuteMsg), &out_dir);
     export_schema(&schema_for!(Cw20BaseQueryMsg), &out_dir);
     export_schema(&schema_for!(AllowanceResponse), &out_dir);

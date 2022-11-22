@@ -9,7 +9,7 @@ use crate::asset::{Asset, AssetInfo, query_token_info};
 
 use cosmwasm_std::{
     Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary, Decimal,
-    CanonicalAddr, SubMsg, WasmMsg, ReplyOn, Uint128, CosmosMsg, StdError, Addr
+    CanonicalAddr, SubMsg, WasmMsg, ReplyOn, Uint128, CosmosMsg, StdError, Addr, Reply
 };
 use halo_token::msg::InstantiateMsg as TokenInstantiateMsg;
 use cw20::{MinterResponse, Cw20ExecuteMsg};
@@ -17,6 +17,7 @@ use integer_sqrt::IntegerSquareRoot;
 use std::cmp::Ordering;
 use std::str::FromStr;
 use cosmwasm_bignumber::{Decimal256, Uint256};
+use cw_utils::parse_reply_instantiate_data;
 
 const CONTRACT_NAME: &str = "crates.io:halo-pair";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -69,6 +70,18 @@ pub fn instantiate(
         reply_on: ReplyOn::Success,
     }))
     
+}
+
+/// This just stores the result for future query
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractError> {
+    let reply = parse_reply_instantiate_data(msg).unwrap();
+    PAIR_INFO.update(deps.storage, |mut meta| -> StdResult<_> {
+        meta.liquidity_token = deps.api.addr_canonicalize(Addr::unchecked(reply.contract_address).as_str())?;
+        Ok(meta)
+    })?;
+
+    Ok(Response::new())
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]

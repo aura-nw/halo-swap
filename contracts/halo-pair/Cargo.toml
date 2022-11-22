@@ -51,6 +51,8 @@ thiserror = { version = "1.0.37" }
 halo-token = { version = "0.1.0", path = "../halo-token", features = ["library"] }
 cosmwasm-bignumber = { version = "0.1.0", path = "../../packages/bignumber" }
 integer-sqrt = "0.1.5"
+protobuf = { version = "3.2.0", features = ["with-bytes"] }
+cw-utils = "0.16.0"
 
 [dev-dependencies]
 cw-multi-test = "0.16.0"

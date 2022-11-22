@@ -13,31 +13,33 @@ async function instantiate(_codeID) {
             prefix: chainConfig.prefix
         }
     );
-    const client = await SigningCosmWasmClient.connectWithSigner(chainConfig.rpcEndpoint, deployerWallet);
+    const client = await SigningCosmWasmClient.connectWithSigner(chainConfig.rpcEndpoint, deployerWallet, {
+        gasPrice: "0.025uaura",
+    });
 
     const account = (await deployerWallet.getAccounts())[0];
 
-    const defaultFee = { amount: [{amount: "200000", denom: chainConfig.denom,},], gas: "200000",};
+    const defaultFee = { amount: [{amount: "300000", denom: chainConfig.denom,},], gas: "auto",};
 
     const codeId = _codeID;
     //Define the instantiate message
-    const instantiateMsg = {"name": "Token B",
-                            "symbol": "TBB",
-                            "decimals": 6,
-                            "initial_balances": [
-                                {           
-                                    "address": account.address,
-                                    "amount": "1000000000000"
+    const instantiateMsg = {"asset_infos": [
+                                {
+                                    "token": {
+                                        "contract_addr": "aura1ecg23djdn0zsdd83nuqd0fpfdfryznmj0w0qf7yv7ay7npsmuucsj29n00"},
+                                },
+                                {
+                                    "token": {
+                                        "contract_addr": "aura1uj77443jlkutrvtteru8p32zkl2vz3nu35pjjsjqcmrfch8hhvms0ysrj4"},
                                 }
                             ],
-                            "mint": {
-                                "minter": account.address,
-                                "cap": "1000000000000"
-                            },
+                            "token_code_id": 669,
+                            "asset_decimals": [6, 6]
                         };
 
+
     //Instantiate the contract
-    const instantiateResponse = await client.instantiate(account.address, Number(_codeID), instantiateMsg, "Instantiate contract", defaultFee);
+    const instantiateResponse = await client.instantiate(account.address, Number(_codeID), instantiateMsg, "Instantiate contract", "auto");
     console.log(instantiateResponse);
 
     // print out the address of the newly created contract

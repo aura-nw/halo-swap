@@ -5,6 +5,5 @@ pub mod pair;
 pub mod asset;
 pub mod swap;
 pub mod liquidity;
-pub mod query;
 
 pub use crate::error::ContractError;

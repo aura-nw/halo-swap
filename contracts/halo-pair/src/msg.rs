@@ -1,7 +1,6 @@
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::Decimal;
-use crate::asset::{ Asset, AssetInfo };
-
+use crate::asset::{ Asset, AssetInfo};
 
 #[cw_serde]
 pub struct InstantiateMsg {
