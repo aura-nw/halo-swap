@@ -22,7 +22,7 @@ async function instantiate(_codeID) {
     const codeId = _codeID;
     //Define the instantiate message
     const instantiateMsg = {"name": "Token B",
-                            "symbol": "TBB",
+                            "symbol": "TkB",
                             "decimals": 6,
                             "initial_balances": [
                                 {           

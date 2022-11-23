@@ -26,14 +26,14 @@ async function instantiate(_codeID) {
     const instantiateMsg = {"asset_infos": [
                                 {
                                     "token": {
-                                        "contract_addr": "aura1ecg23djdn0zsdd83nuqd0fpfdfryznmj0w0qf7yv7ay7npsmuucsj29n00"},
+                                        "contract_addr": "aura159pvmqrkr5tlm0vw40uw5mshzzg0z37ypvh6wj2ksmpruecqxvfsasc5aq"},
                                 },
                                 {
                                     "token": {
-                                        "contract_addr": "aura1uj77443jlkutrvtteru8p32zkl2vz3nu35pjjsjqcmrfch8hhvms0ysrj4"},
+                                        "contract_addr": "aura1pj8dqg4u8t3ng4eg6zu4jpwt8czsr5tys64j3s4h8k5qwelhv00sq8xslq"},
                                 }
                             ],
-                            "token_code_id": 669,
+                            "token_code_id": 703,
                             "asset_decimals": [6, 6]
                         };
 

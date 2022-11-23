@@ -1,0 +1,26 @@
+{
+	"halo_token_A": {
+		"code_id": 703,
+		"address": "aura159pvmqrkr5tlm0vw40uw5mshzzg0z37ypvh6wj2ksmpruecqxvfsasc5aq"
+	},
+	"halo_token_B": {
+		"code_id": 703,
+		"address": "aura1pj8dqg4u8t3ng4eg6zu4jpwt8czsr5tys64j3s4h8k5qwelhv00sq8xslq"
+	},
+	"halo_pair_1": {
+		"code_id": 705,
+		"address": "aura165m56tck3x86nxvndegj2fe647lke0qgh40832qejqsm2agpwslsrkx77f"
+	},
+	"halo_LP_token_1": {
+		"code_id": 703,
+		"address": "aura1hax2e9wfq7v0t0rcrywz8dxwlz8ua8w9xvjmgluvhsvhkvyqlcss4ce47p"
+	},
+	"halo_factory": {
+		"code_id": 706,
+		"address": "aura1vmj2v84njzahsg594luvf33yy2nhf9m9tqp9fcer6nqt50xfmewqcmmxw9"
+	},
+	"halo_router": {
+		"code_id": 708,
+		"address": "aura1t6sxhfs2ffdxf3zvduwseld0c9wyvy7m9srnuht2rlv4v469f6tspapxn3"
+	}
+}

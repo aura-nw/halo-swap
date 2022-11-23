@@ -38,4 +38,8 @@ pub enum QueryMsg {
     NativeTokenDecimals {
         _denom: String,
     },
+    Pair {},
+    // Pool {},
+    // Simulation { offer_asset: Asset },
+    // ReverseSimulation { ask_asset: Asset },
 }

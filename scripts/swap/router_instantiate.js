@@ -21,9 +21,7 @@ async function instantiate(_codeID) {
 
     const codeId = _codeID;
     //Define the instantiate message
-    const instantiateMsg = {"name":"AURA ACCOUNT BOUND",
-                            "symbol":"AAB",
-                            "minter":account.address,};
+    const instantiateMsg = {"auraswap_factory":"aura1vmj2v84njzahsg594luvf33yy2nhf9m9tqp9fcer6nqt50xfmewqcmmxw9",};
 
 
     //Instantiate the contract

@@ -4,7 +4,7 @@ use cw2::set_contract_version;
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::pair::{ PairInfoRaw, PAIR_INFO, COMMISSION_RATE };
+use crate::pair::{ PairInfoRaw, PAIR_INFO, COMMISSION_RATE, PairInfo };
 use crate::asset::{Asset, AssetInfo, query_token_info};
 
 use cosmwasm_std::{
@@ -134,13 +134,21 @@ pub fn execute(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> Result<Binary, ContractError> {
     match msg {
         QueryMsg::NativeTokenDecimals { _denom } => {
             // to_binary(&query_native_token_decimal(deps, denom)?)
             // return default response
             Ok(Binary::from(b"0".to_vec()))
         }
+        QueryMsg::Pair {} => Ok(to_binary(&query_pair_info(deps)?)?),
+        // QueryMsg::Pool {} => Ok(to_binary(&query_pool(deps)?)?),
+        // QueryMsg::Simulation { offer_asset } => {
+        //     Ok(to_binary(&query_simulation(deps, offer_asset)?)?)
+        // }
+        // QueryMsg::ReverseSimulation { ask_asset } => {
+        //     Ok(to_binary(&query_reverse_simulation(deps, ask_asset)?)?)
+        // }
     }
 }
 
@@ -511,4 +519,11 @@ pub fn assert_max_spread(
     }
 
     Ok(())
+}
+
+pub fn query_pair_info(deps: Deps) -> Result<PairInfo, ContractError> {
+    let pair_info: PairInfoRaw = PAIR_INFO.load(deps.storage)?;
+    let pair_info = pair_info.to_normal(deps.api)?;
+
+    Ok(pair_info)
 }

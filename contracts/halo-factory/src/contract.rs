@@ -1,15 +1,16 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Order, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, StdError, SubMsg, WasmMsg, CosmosMsg, to_binary, ReplyOn, Storage, Api};
+use cosmwasm_std::{Order, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, StdError, SubMsg, WasmMsg, CosmosMsg, to_binary, ReplyOn, Storage, Api, Reply, Addr, QuerierWrapper, QueryRequest, WasmQuery};
 use cw2::set_contract_version;
 use cw_storage_plus::Bound;
 use halo_pair::asset::{AssetInfo, query_balance, pair_key, add_allow_native_token, AssetInfoRaw};
-use halo_pair::msg::InstantiateMsg as PairInstantiateMsg;
+use halo_pair::msg::{InstantiateMsg as PairInstantiateMsg, QueryMsg as PairQueryMsg};
 use halo_pair::pair::{MigrateMsg as PairMigrateMsg, PairInfo, PairInfoRaw, PairsResponse};
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{ Config, CONFIG, TMP_PAIR_INFO, PAIRS, TmpPairInfo, ConfigResponse, MAX_LIMIT, DEFAULT_LIMIT};
+use cw_utils::parse_reply_instantiate_data;
 
 const CONTRACT_NAME: &str = "crates.io:halo-factory";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -52,6 +53,39 @@ pub fn execute(
             execute_migrate_pair(deps, env, info, contract, code_id),
     }
 }
+
+/// This just stores the result for future query
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
+    let tmp_pair_info = TMP_PAIR_INFO.load(deps.storage)?;
+
+    let reply = parse_reply_instantiate_data(msg).unwrap();
+
+    // let res: MsgInstantiateContractResponse =
+    //     Message::parse_from_bytes(msg.result.unwrap().data.unwrap().as_slice()).map_err(|_| {
+    //         StdError::parse_err("MsgInstantiateContractResponse", "failed to parse data")
+    //     })?;
+
+    let pair_contract = &reply.contract_address;
+    let pair_info = query_pair_info_from_pair(&deps.querier, Addr::unchecked(pair_contract))?;
+
+    PAIRS.save(
+        deps.storage,
+        &tmp_pair_info.pair_key,
+        &PairInfoRaw {
+            liquidity_token: deps.api.addr_canonicalize(&pair_info.liquidity_token)?,
+            contract_addr: deps.api.addr_canonicalize(&pair_contract)?,
+            asset_infos: tmp_pair_info.asset_infos,
+            asset_decimals: tmp_pair_info.asset_decimals,
+        },
+    )?;
+
+    Ok(Response::new().add_attributes(vec![
+        ("pair_contract_addr", pair_contract),
+        ("liquidity_token_addr", &pair_info.liquidity_token.to_string()),
+    ]))
+}
+
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
@@ -309,4 +343,16 @@ fn calc_range_start(start_after: Option<[AssetInfoRaw; 2]>) -> Option<Vec<u8>> {
         v.push(1);
         v
     })
+}
+
+pub fn query_pair_info_from_pair(
+    querier: &QuerierWrapper,
+    pair_contract: Addr,
+) -> StdResult<PairInfo> {
+    let pair_info: PairInfo = querier.query(&QueryRequest::Wasm(WasmQuery::Smart {
+        contract_addr: pair_contract.to_string(),
+        msg: to_binary(&PairQueryMsg::Pair {})?,
+    }))?;
+
+    Ok(pair_info)
 }
