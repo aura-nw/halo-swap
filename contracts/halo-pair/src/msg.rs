@@ -1,5 +1,6 @@
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::Decimal;
+use cw20::Cw20ReceiveMsg;
 use crate::asset::{ Asset, AssetInfo};
 
 #[cw_serde]
@@ -13,8 +14,7 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    // TODO: skip 'Receive' message temporarily
-    // Receive(Cw20ReceiveMsg),
+    Receive(Cw20ReceiveMsg),
     /// ProvideLiquidity a user provides pool liquidity
     ProvideLiquidity {
         assets: [Asset; 2],

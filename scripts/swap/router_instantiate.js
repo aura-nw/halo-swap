@@ -21,7 +21,7 @@ async function instantiate(_codeID) {
 
     const codeId = _codeID;
     //Define the instantiate message
-    const instantiateMsg = {"auraswap_factory":"aura1vmj2v84njzahsg594luvf33yy2nhf9m9tqp9fcer6nqt50xfmewqcmmxw9",};
+    const instantiateMsg = {"auraswap_factory":"aura1g8xt7rxmq6h3tq7fd2atux99jurx7qc5w4aua2etjyck0y44mvhsssamyn",};
 
 
     //Instantiate the contract

@@ -1,7 +1,7 @@
 
 use cosmwasm_schema::cw_serde;
 use cw_storage_plus::Item;
-use cosmwasm_std::{Addr, Api, CanonicalAddr, QuerierWrapper, StdResult};
+use cosmwasm_std::{Addr, Api, CanonicalAddr, QuerierWrapper, StdResult, Decimal};
 
 use crate::asset::{Asset, AssetInfo, AssetInfoRaw};
 
@@ -73,4 +73,15 @@ impl PairInfoRaw {
             },
         ])
     }
+}
+
+#[cw_serde]
+pub enum Cw20HookMsg {
+    /// Sell a given amount of asset
+    Swap {
+        belief_price: Option<Decimal>,
+        max_spread: Option<Decimal>,
+        to: Option<String>,
+    },
+    WithdrawLiquidity {},
 }

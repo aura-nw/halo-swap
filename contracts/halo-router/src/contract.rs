@@ -242,7 +242,7 @@ pub fn execute_swap_operation(
                 &[offer_asset_info.clone(), ask_asset_info],
             )?;
 
-            // query the balance amount of offer pool
+            // query the balance amount of offer in the contract
             let amount = match offer_asset_info.clone() {
                 AssetInfo::NativeToken { denom } => {
                     query_balance(&deps.querier, env.contract.address, denom)?
