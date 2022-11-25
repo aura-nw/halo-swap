@@ -531,9 +531,13 @@ pub fn query_reverse_simulation(
     deps: Deps,
     ask_asset: Asset,
 ) -> Result<ReverseSimulationResponse, ContractError> {
+    // get pair info
     let pair_info: PairInfoRaw = PAIR_INFO.load(deps.storage)?;
 
+    // get address of the pair contract
     let contract_addr = deps.api.addr_humanize(&pair_info.contract_addr)?;
+    
+    // get pool info of the pair contract
     let pools: [Asset; 2] = pair_info.query_pools(&deps.querier, deps.api, contract_addr)?;
 
     let offer_pool: Asset;
@@ -548,6 +552,7 @@ pub fn query_reverse_simulation(
         return Err(ContractError::AssetMismatch {});
     }
 
+    // compute offer amount, spread amount, commission amount when user provide ask amount
     let (offer_amount, spread_amount, commission_amount) =
         compute_offer_amount(offer_pool.amount, ask_pool.amount, ask_asset.amount);
 
@@ -620,6 +625,7 @@ fn test_compute_swap_with_huge_pool_variance() {
     );
 }
 
+// The function to get the offer_amount when user provide ask_amount
 fn compute_offer_amount(
     offer_pool: Uint128,
     ask_pool: Uint128,
@@ -631,6 +637,7 @@ fn compute_offer_amount(
 
     let commission_rate = Decimal256::from_str(COMMISSION_RATE).unwrap();
 
+    // EQUATION: A = \frac{K}{R_B - (B * (1-P))} - R_A
     // ask => offer
     // offer_amount = cp / (ask_pool - ask_amount / (1 - commission_rate)) - offer_pool
     let cp: Uint256 = offer_pool * ask_pool;

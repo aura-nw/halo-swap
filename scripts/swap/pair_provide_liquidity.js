@@ -21,8 +21,8 @@ async function ProvideLiquidity(_contract) {
     
     // const pairAddress = "aura165m56tck3x86nxvndegj2fe647lke0qgh40832qejqsm2agpwslsrkx77f";
 
-    const tokenAAddress = "aura1c7fycp5q0ydst0ukgt7sn69utagrpp6374mv4g9t87tg5eeyu4zq9klg6k";
-    const tokenBAddress = "aura1zz8pvrr7qyul7wcucaq0mva056z3f9pr8q2jcqf8qjzqtvtdrt5s7ee6vd";
+    const tokenAAddress = "aura15pp33amcmxd703szqrtp8fvxdsm9kf4jh9x29920qa6x362g04asf62v23";
+    const tokenBAddress = "aura19sqmgzw09qz337wpu7pvu03yvz08s8n4lx89ul657x4kx07mekqs6ysgez";
 
     // create query message to get the pair infor
     const queryMsg = {

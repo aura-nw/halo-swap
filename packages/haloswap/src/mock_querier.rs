@@ -34,7 +34,7 @@ pub fn mock_dependencies(
 pub struct WasmMockQuerier {
     base: MockQuerier,
     token_querier: TokenQuerier,
-    halo_factory_querier: haloFactoryQuerier,
+    halo_factory_querier: HaloFactoryQuerier,
 }
 
 #[derive(Clone, Default)]
@@ -67,14 +67,14 @@ pub(crate) fn balances_to_map(
 }
 
 #[derive(Clone, Default)]
-pub struct haloFactoryQuerier {
+pub struct HaloFactoryQuerier {
     pairs: HashMap<String, PairInfo>,
     native_token_decimals: HashMap<String, u8>,
 }
 
-impl haloFactoryQuerier {
+impl HaloFactoryQuerier {
     pub fn new(pairs: &[(&String, &PairInfo)], native_token_decimals: &[(String, u8)]) -> Self {
-        haloFactoryQuerier {
+        HaloFactoryQuerier {
             pairs: pairs_to_map(pairs),
             native_token_decimals: native_token_decimals_to_map(native_token_decimals),
         }
@@ -264,7 +264,7 @@ impl WasmMockQuerier {
         WasmMockQuerier {
             base,
             token_querier: TokenQuerier::default(),
-            halo_factory_querier: haloFactoryQuerier::default(),
+            halo_factory_querier: HaloFactoryQuerier::default(),
         }
     }
 
@@ -279,7 +279,7 @@ impl WasmMockQuerier {
         pairs: &[(&String, &PairInfo)],
         native_token_decimals: &[(String, u8)],
     ) {
-        self.halo_factory_querier = haloFactoryQuerier::new(pairs, native_token_decimals);
+        self.halo_factory_querier = HaloFactoryQuerier::new(pairs, native_token_decimals);
     }
 
     pub fn with_balance(&mut self, balances: &[(&String, Vec<Coin>)]) {

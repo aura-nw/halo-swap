@@ -1,26 +1,26 @@
 {
 	"aura_token_A": {
-		"code_id": 730,
-		"address": "aura1c7fycp5q0ydst0ukgt7sn69utagrpp6374mv4g9t87tg5eeyu4zq9klg6k"
+		"code_id": 750,
+		"address": "aura15pp33amcmxd703szqrtp8fvxdsm9kf4jh9x29920qa6x362g04asf62v23"
 	},
 	"aura_token_B": {
-		"code_id": 730,
-		"address": "aura1zz8pvrr7qyul7wcucaq0mva056z3f9pr8q2jcqf8qjzqtvtdrt5s7ee6vd"
+		"code_id": 750,
+		"address": "aura19sqmgzw09qz337wpu7pvu03yvz08s8n4lx89ul657x4kx07mekqs6ysgez"
 	},
 	"aura_pair_1": {
-		"code_id": 740,
-		"address": "aura1ydylkudf57gmrfla95scqahhu35g9sjy80ug34w5wvqgfhk42gaspzknw9"
+		"code_id": 751,
+		"address": "aura1wnlxn3l5cellfv4x8xyek2ngzkaj9ejpreyupm4hg396qgweyy6s6q3zrq"
 	},
 	"aura_LP_token_1": {
-		"code_id": 730,
-		"address": "aura1wxkz8yr736p9w9v5hu2jgv4dr3u3zfv9af7pltwqahw5e8pguegq5ay0zp"
+		"code_id": 750,
+		"address": "aura1gqgcfgjh4yjq9z98v6r2ek5vtmqp0a42du89age247tr07avt7rs65qfpz"
 	},
 	"aura_factory": {
-		"code_id": 741,
-		"address": "aura1maq9kjdktdeg484syuu04cgzvse27vg5qmlclce9xukh6vn5x3pspj0cnv"
+		"code_id": 752,
+		"address": "aura1ft7keajm5x7un2h6x9jurw56lk6w03x94m3k25uvlpv6pw3dvt8q7gdd03"
 	},
 	"aura_router": {
-		"code_id": 742,
-		"address": "aura135s8rjljl07qvc6wl46pn2v7j0nvmzqgl5qs3uyurq2pc0pvwftsexjgye"
+		"code_id": 753,
+		"address": "aura1glnpxkrpex9ef83ycg9mnn5n6eu5gxe9wqq7j6tj7qmvnna66f7se8s0nt"
 	}
 }

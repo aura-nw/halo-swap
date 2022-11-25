@@ -538,7 +538,6 @@ dependencies = [
  "cw2 0.15.1",
  "cw20",
  "haloswap",
- "protobuf 2.28.0",
  "schemars",
  "serde",
  "thiserror",
@@ -559,7 +558,6 @@ dependencies = [
  "cw20",
  "haloswap",
  "integer-sqrt",
- "protobuf 2.28.0",
  "schemars",
  "serde",
  "thiserror",
@@ -609,7 +607,7 @@ dependencies = [
  "cosmwasm-std",
  "cosmwasm-storage",
  "cw20",
- "protobuf 3.2.0",
+ "protobuf",
  "schemars",
  "serde",
 ]
@@ -741,15 +739,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "protobuf"
-version = "2.28.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "106dd99e98437432fed6519dedecfade6a06a73bb7b2a1e019fdd2bee5778d94"
-dependencies = [
- "bytes",
 ]
 
 [[package]]

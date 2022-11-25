@@ -22,8 +22,8 @@ async function instantiate(_codeID) {
     const codeId = _codeID;
     //Define the instantiate message
     const instantiateMsg = {
-                            "token_code_id": 730,
-                            "pair_code_id": 740,
+                            "token_code_id": 750,
+                            "pair_code_id": 751,
                         };
 
     //Instantiate the contract

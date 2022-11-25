@@ -25,15 +25,15 @@ async function swap(_contract) {
 
     const memo = "swap";
 
-    const tokenAAddress = "aura1c7fycp5q0ydst0ukgt7sn69utagrpp6374mv4g9t87tg5eeyu4zq9klg6k";
-    const tokenBAddress = "aura1zz8pvrr7qyul7wcucaq0mva056z3f9pr8q2jcqf8qjzqtvtdrt5s7ee6vd";
+    const tokenAAddress = "aura15pp33amcmxd703szqrtp8fvxdsm9kf4jh9x29920qa6x362g04asf62v23";
+    const tokenBAddress = "aura19sqmgzw09qz337wpu7pvu03yvz08s8n4lx89ul657x4kx07mekqs6ysgez";
 
     // define the hook cw20 message
     const hookMsg = {
         "execute_swap_operations": {
             "operations": [
                 {
-                    "aura_swap":{
+                    "halo_swap":{
                         "offer_asset_info": {
                             "token": {
                                 "contract_addr": tokenAAddress
