@@ -1,17 +1,26 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Order, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, StdError, SubMsg, WasmMsg, CosmosMsg, to_binary, ReplyOn, Storage, Api, Reply, Addr, QuerierWrapper, QueryRequest, WasmQuery};
+use cosmwasm_std::{
+    to_binary, Addr, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Reply, ReplyOn, Response,
+    StdError, StdResult, SubMsg, WasmMsg,
+};
 use cw2::set_contract_version;
-use cw_storage_plus::Bound;
-use halo_pair::asset::{AssetInfo, query_balance, pair_key, add_allow_native_token, AssetInfoRaw};
-use halo_pair::msg::{InstantiateMsg as PairInstantiateMsg, QueryMsg as PairQueryMsg};
-use halo_pair::pair::{MigrateMsg as PairMigrateMsg, PairInfo, PairInfoRaw, PairsResponse};
+use haloswap::querier::{query_balance, query_pair_info_from_pair};
 
-use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{ Config, CONFIG, TMP_PAIR_INFO, PAIRS, TmpPairInfo, ConfigResponse, MAX_LIMIT, DEFAULT_LIMIT};
+use crate::state::{
+    add_allow_native_token, pair_key, read_pairs, Config, TmpPairInfo, ALLOW_NATIVE_TOKENS, CONFIG,
+    PAIRS, TMP_PAIR_INFO,
+};
+
 use cw_utils::parse_reply_instantiate_data;
+use haloswap::asset::{AssetInfo, PairInfo, PairInfoRaw};
+use haloswap::factory::{
+    ConfigResponse, ExecuteMsg, InstantiateMsg, MigrateMsg, NativeTokenDecimalsResponse,
+    PairsResponse, QueryMsg,
+};
+use haloswap::pair::{InstantiateMsg as PairInstantiateMsg, MigrateMsg as PairMigrateMsg};
 
+// version info for migration info
 const CONTRACT_NAME: &str = "crates.io:halo-factory";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -21,7 +30,7 @@ pub fn instantiate(
     _env: Env,
     info: MessageInfo,
     msg: InstantiateMsg,
-) -> Result<Response, ContractError> {
+) -> StdResult<Response> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     let config = Config {
@@ -36,68 +45,20 @@ pub fn instantiate(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn execute(
-    deps: DepsMut,
-    env: Env,
-    info: MessageInfo,
-    msg: ExecuteMsg,
-) -> StdResult<Response> {
+pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> StdResult<Response> {
     match msg {
-        ExecuteMsg::UpdateConfig { owner, token_code_id, pair_code_id } => 
-            execute_update_config(deps, env, info, owner, token_code_id, pair_code_id),
-        ExecuteMsg::CreatePair { asset_infos } => 
-            execute_create_pair(deps, env, info, asset_infos),
-        ExecuteMsg::AddNativeTokenDecimals { denom, decimals } => 
-            execute_add_native_token_decimals(deps, env, info, denom, decimals),
-        ExecuteMsg::MigratePair { contract, code_id } => 
-            execute_migrate_pair(deps, env, info, contract, code_id),
-    }
-}
-
-/// This just stores the result for future query
-#[cfg_attr(not(feature = "library"), entry_point)]
-pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
-    let tmp_pair_info = TMP_PAIR_INFO.load(deps.storage)?;
-
-    let reply = parse_reply_instantiate_data(msg).unwrap();
-
-    // let res: MsgInstantiateContractResponse =
-    //     Message::parse_from_bytes(msg.result.unwrap().data.unwrap().as_slice()).map_err(|_| {
-    //         StdError::parse_err("MsgInstantiateContractResponse", "failed to parse data")
-    //     })?;
-
-    let pair_contract = &reply.contract_address;
-    let pair_info = query_pair_info_from_pair(&deps.querier, Addr::unchecked(pair_contract))?;
-
-    PAIRS.save(
-        deps.storage,
-        &tmp_pair_info.pair_key,
-        &PairInfoRaw {
-            liquidity_token: deps.api.addr_canonicalize(&pair_info.liquidity_token)?,
-            contract_addr: deps.api.addr_canonicalize(&pair_contract)?,
-            asset_infos: tmp_pair_info.asset_infos,
-            asset_decimals: tmp_pair_info.asset_decimals,
-        },
-    )?;
-
-    Ok(Response::new().add_attributes(vec![
-        ("pair_contract_addr", pair_contract),
-        ("liquidity_token_addr", &pair_info.liquidity_token.to_string()),
-    ]))
-}
-
-
-#[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
-    match msg {
-        QueryMsg::Config {} => to_binary(&query_config(deps)?),
-        QueryMsg::Pair { asset_infos } => to_binary(&query_pair(deps, asset_infos)?),
-        QueryMsg::Pairs { start_after, limit } => {
-            to_binary(&query_pairs(deps, start_after, limit)?)
+        ExecuteMsg::UpdateConfig {
+            owner,
+            token_code_id,
+            pair_code_id,
+        } => execute_update_config(deps, env, info, owner, token_code_id, pair_code_id),
+        ExecuteMsg::CreatePair { asset_infos } => execute_create_pair(deps, env, info, asset_infos),
+        ExecuteMsg::AddNativeTokenDecimals { denom, decimals } => {
+            execute_add_native_token_decimals(deps, env, info, denom, decimals)
         }
-        // QueryMsg::NativeTokenDecimals { denom } => {
-        //     to_binary(&query_native_token_decimal(deps, denom)?)
-        // }
+        ExecuteMsg::MigratePair { contract, code_id } => {
+            execute_migrate_pair(deps, env, info, contract, code_id)
+        }
     }
 }
 
@@ -262,6 +223,52 @@ pub fn execute_migrate_pair(
     )
 }
 
+/// This just stores the result for future query
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
+    let tmp_pair_info = TMP_PAIR_INFO.load(deps.storage)?;
+
+    let reply = parse_reply_instantiate_data(msg).unwrap();
+
+    // let res: MsgInstantiateContractResponse =
+    //     Message::parse_from_bytes(msg.result.unwrap().data.unwrap().as_slice()).map_err(|_| {
+    //         StdError::parse_err("MsgInstantiateContractResponse", "failed to parse data")
+    //     })?;
+
+    let pair_contract = &reply.contract_address;
+    let pair_info = query_pair_info_from_pair(&deps.querier, Addr::unchecked(pair_contract))?;
+
+    PAIRS.save(
+        deps.storage,
+        &tmp_pair_info.pair_key,
+        &PairInfoRaw {
+            liquidity_token: deps.api.addr_canonicalize(&pair_info.liquidity_token)?,
+            contract_addr: deps.api.addr_canonicalize(&pair_contract)?,
+            asset_infos: tmp_pair_info.asset_infos,
+            asset_decimals: tmp_pair_info.asset_decimals,
+        },
+    )?;
+
+    Ok(Response::new().add_attributes(vec![
+        ("pair_contract_addr", pair_contract),
+        ("liquidity_token_addr", &pair_info.liquidity_token.to_string()),
+    ]))
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    match msg {
+        QueryMsg::Config {} => to_binary(&query_config(deps)?),
+        QueryMsg::Pair { asset_infos } => to_binary(&query_pair(deps, asset_infos)?),
+        QueryMsg::Pairs { start_after, limit } => {
+            to_binary(&query_pairs(deps, start_after, limit)?)
+        }
+        QueryMsg::NativeTokenDecimals { denom } => {
+            to_binary(&query_native_token_decimal(deps, denom)?)
+        }
+    }
+}
+
 pub fn query_config(deps: Deps) -> StdResult<ConfigResponse> {
     let state: Config = CONFIG.load(deps.storage)?;
     let resp = ConfigResponse {
@@ -302,57 +309,18 @@ pub fn query_pairs(
     Ok(resp)
 }
 
-// pub fn query_native_token_decimal(
-//     deps: Deps,
-//     denom: String,
-// ) -> StdResult<NativeTokenDecimalsResponse> {
-//     let decimals = ALLOW_NATIVE_TOKENS.load(deps.storage, denom.as_bytes())?;
+pub fn query_native_token_decimal(
+    deps: Deps,
+    denom: String,
+) -> StdResult<NativeTokenDecimalsResponse> {
+    let decimals = ALLOW_NATIVE_TOKENS.load(deps.storage, denom.as_bytes())?;
 
-//     Ok(NativeTokenDecimalsResponse { decimals })
-// }
-
-pub fn read_pairs(
-    storage: &dyn Storage,
-    api: &dyn Api,
-    start_after: Option<[AssetInfoRaw; 2]>,
-    limit: Option<u32>,
-) -> StdResult<Vec<PairInfo>> {
-    let limit = limit.unwrap_or(DEFAULT_LIMIT).min(MAX_LIMIT) as usize;
-    let start = calc_range_start(start_after).map(Bound::ExclusiveRaw);
-
-    PAIRS
-        .range(storage, start, None, Order::Ascending)
-        .take(limit)
-        .map(|item| {
-            let (_, v) = item?;
-            v.to_normal(api)
-        })
-        .collect::<StdResult<Vec<PairInfo>>>()
+    Ok(NativeTokenDecimalsResponse { decimals })
 }
 
-// this will set the first key after the provided key, by appending a 1 byte
-fn calc_range_start(start_after: Option<[AssetInfoRaw; 2]>) -> Option<Vec<u8>> {
-    start_after.map(|asset_infos| {
-        let mut asset_infos = asset_infos.to_vec();
-        asset_infos.sort_by(|a, b| a.as_bytes().cmp(b.as_bytes()));
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> StdResult<Response> {
+    set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
-        let mut v = [asset_infos[0].as_bytes(), asset_infos[1].as_bytes()]
-            .concat()
-            .as_slice()
-            .to_vec();
-        v.push(1);
-        v
-    })
-}
-
-pub fn query_pair_info_from_pair(
-    querier: &QuerierWrapper,
-    pair_contract: Addr,
-) -> StdResult<PairInfo> {
-    let pair_info: PairInfo = querier.query(&QueryRequest::Wasm(WasmQuery::Smart {
-        contract_addr: pair_contract.to_string(),
-        msg: to_binary(&PairQueryMsg::Pair {})?,
-    }))?;
-
-    Ok(pair_info)
+    Ok(Response::default())
 }

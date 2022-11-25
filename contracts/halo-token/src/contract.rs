@@ -8,9 +8,10 @@ use cw20_base::msg::{ExecuteMsg, QueryMsg};
 use cw20_base::state::{MinterData, TokenInfo, TOKEN_INFO};
 use cw20_base::ContractError;
 
-use crate::msg::InstantiateMsg;
+use haloswap::token::InstantiateMsg;
 
-const CONTRACT_NAME: &str = "crates.io:halo-token";
+// version info for migration info
+const CONTRACT_NAME: &str = "crates.io:cw20-base";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -21,23 +22,20 @@ pub fn instantiate(
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
-
-    // check valid token information
+    // check valid token info
     msg.validate()?;
 
-    // initiate balances for an addresses. Contains an address and the amount of tokens for that address.
+    // create initial accounts
     let total_supply = create_accounts(&mut deps, &msg.initial_balances)?;
 
-    // we need ensure that the initial supply is not greater than the cap
-    if let Some(cap) = msg.get_cap() {
-        if total_supply > cap {
+    if let Some(limit) = msg.get_cap() {
+        if total_supply > limit {
             return Err(ContractError::Std(StdError::generic_err(
                 "Initial supply greater than cap",
             )));
         }
     }
 
-    // create mint info from the mint value in the InstantiateMsg
     let mint = match msg.mint {
         Some(m) => Some(MinterData {
             minter: deps.api.addr_validate(&m.minter)?,
@@ -46,8 +44,8 @@ pub fn instantiate(
         None => None,
     };
 
-    // create token info from the InstantiateMsg
-    let info = TokenInfo {
+    // store token info
+    let data = TokenInfo {
         name: msg.name,
         symbol: msg.symbol,
         decimals: msg.decimals,
@@ -55,9 +53,7 @@ pub fn instantiate(
         mint,
     };
 
-    // store the token info
-    TOKEN_INFO.save(deps.storage, &info)?;
-
+    TOKEN_INFO.save(deps.storage, &data)?;
     Ok(Response::default())
 }
 
@@ -68,17 +64,10 @@ pub fn execute(
     info: MessageInfo,
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
-    // we pass the execution to the cw20 base contract
     cw20_execute(deps, env, info, msg)
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(
-    deps: Deps, 
-    env: Env, 
-    msg: QueryMsg
-) -> StdResult<Binary> {
-    // we pass the query to the cw20 base contract
+pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
     cw20_query(deps, env, msg)
 }
-

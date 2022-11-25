@@ -1,23 +1,15 @@
-
-use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{
-    to_binary, Addr, Api, BankMsg, BalanceResponse, BankQuery, CanonicalAddr, Coin, CosmosMsg, 
-    MessageInfo, QuerierWrapper, StdError, StdResult, SubMsg, Uint128, WasmMsg, QueryRequest, WasmQuery, Deps, Storage
-};
-use cw_storage_plus::Map;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 use std::fmt;
-use crate::msg::QueryMsg;
-use cw20::{BalanceResponse as Cw20BalanceResponse, Cw20QueryMsg, TokenInfoResponse, Cw20ExecuteMsg};
 
-// TODO: Add function to switch status of ALLOW_NATIVE_TOKENS
-pub const ALLOW_NATIVE_TOKENS: Map<&[u8], u8> = Map::new("allow_native_token");
+use crate::querier::{query_balance, query_native_decimals, query_token_balance, query_token_info};
+use cosmwasm_std::{
+    to_binary, Addr, Api, BankMsg, CanonicalAddr, Coin, CosmosMsg, MessageInfo, QuerierWrapper,
+    StdError, StdResult, SubMsg, Uint128, WasmMsg,
+};
+use cw20::Cw20ExecuteMsg;
 
-#[cw_serde]
-pub struct NativeTokenDecimalsResponse {
-    pub decimals: u8,
-}
-
-#[cw_serde]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct Asset {
     pub info: AssetInfo,
     pub amount: Uint128,
@@ -98,29 +90,10 @@ impl Asset {
     }
 }
 
-#[cw_serde]
-pub struct AssetRaw {
-    pub info: AssetInfoRaw,
-    pub amount: Uint128,
-}
-
-impl AssetRaw {
-    pub fn to_normal(&self, api: &dyn Api) -> StdResult<Asset> {
-        Ok(Asset {
-            info: match &self.info {
-                AssetInfoRaw::NativeToken { denom } => AssetInfo::NativeToken {
-                    denom: denom.to_string(),
-                },
-                AssetInfoRaw::Token { contract_addr } => AssetInfo::Token {
-                    contract_addr: api.addr_humanize(contract_addr)?.to_string(),
-                },
-            },
-            amount: self.amount,
-        })
-    }
-}
-
-#[cw_serde]
+/// AssetInfo contract_addr is usually passed from the cw20 hook
+/// so we can trust the contract_addr is properly validated.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
 pub enum AssetInfo {
     Token { contract_addr: String },
     NativeToken { denom: String },
@@ -153,8 +126,6 @@ impl AssetInfo {
             AssetInfo::Token { .. } => false,
         }
     }
-
-    // 
     pub fn query_pool(
         &self,
         querier: &QuerierWrapper,
@@ -205,7 +176,29 @@ impl AssetInfo {
     }
 }
 
-#[cw_serde]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct AssetRaw {
+    pub info: AssetInfoRaw,
+    pub amount: Uint128,
+}
+
+impl AssetRaw {
+    pub fn to_normal(&self, api: &dyn Api) -> StdResult<Asset> {
+        Ok(Asset {
+            info: match &self.info {
+                AssetInfoRaw::NativeToken { denom } => AssetInfo::NativeToken {
+                    denom: denom.to_string(),
+                },
+                AssetInfoRaw::Token { contract_addr } => AssetInfo::Token {
+                    contract_addr: api.addr_humanize(contract_addr)?.to_string(),
+                },
+            },
+            amount: self.amount,
+        })
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub enum AssetInfoRaw {
     Token { contract_addr: CanonicalAddr },
     NativeToken { denom: String },
@@ -252,83 +245,53 @@ impl AssetInfoRaw {
     }
 }
 
-pub fn query_token_balance(
-    querier: &QuerierWrapper,
-    contract_addr: Addr,
-    account_addr: Addr,
-) -> StdResult<Uint128> {
-    let res: Cw20BalanceResponse = querier.query(&QueryRequest::Wasm(WasmQuery::Smart {
-        contract_addr: contract_addr.to_string(),
-        msg: to_binary(&Cw20QueryMsg::Balance {
-            address: account_addr.to_string(),
-        })?,
-    }))?;
-
-    // load balance form the token contract
-    Ok(res.balance)
+// We define a custom struct for each query response
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct PairInfo {
+    pub asset_infos: [AssetInfo; 2],
+    pub contract_addr: String,
+    pub liquidity_token: String,
+    pub asset_decimals: [u8; 2],
 }
 
-pub fn query_token_info(
-    querier: &QuerierWrapper,
-    contract_addr: Addr,
-) -> StdResult<TokenInfoResponse> {
-    let token_info: TokenInfoResponse = querier.query(&QueryRequest::Wasm(WasmQuery::Smart {
-        contract_addr: contract_addr.to_string(),
-        msg: to_binary(&Cw20QueryMsg::TokenInfo {})?,
-    }))?;
-
-    Ok(token_info)
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct PairInfoRaw {
+    pub asset_infos: [AssetInfoRaw; 2],
+    pub contract_addr: CanonicalAddr,
+    pub liquidity_token: CanonicalAddr,
+    pub asset_decimals: [u8; 2],
 }
 
-pub fn query_native_decimals(
-    querier: &QuerierWrapper,
-    factory_contract: Addr,
-    denom: String,
-) -> StdResult<u8> {
-    let res: NativeTokenDecimalsResponse =
-        querier.query(&QueryRequest::Wasm(WasmQuery::Smart {
-            contract_addr: factory_contract.to_string(),
-            msg: to_binary(&QueryMsg::NativeTokenDecimals { _denom: denom })?,
-        }))?;
-    Ok(res.decimals)
+impl PairInfoRaw {
+    pub fn to_normal(&self, api: &dyn Api) -> StdResult<PairInfo> {
+        Ok(PairInfo {
+            liquidity_token: api.addr_humanize(&self.liquidity_token)?.to_string(),
+            contract_addr: api.addr_humanize(&self.contract_addr)?.to_string(),
+            asset_infos: [
+                self.asset_infos[0].to_normal(api)?,
+                self.asset_infos[1].to_normal(api)?,
+            ],
+            asset_decimals: self.asset_decimals,
+        })
+    }
+
+    pub fn query_pools(
+        &self,
+        querier: &QuerierWrapper,
+        api: &dyn Api,
+        contract_addr: Addr,
+    ) -> StdResult<[Asset; 2]> {
+        let info_0: AssetInfo = self.asset_infos[0].to_normal(api)?;
+        let info_1: AssetInfo = self.asset_infos[1].to_normal(api)?;
+        Ok([
+            Asset {
+                amount: info_0.query_pool(querier, api, contract_addr.clone())?,
+                info: info_0,
+            },
+            Asset {
+                amount: info_1.query_pool(querier, api, contract_addr)?,
+                info: info_1,
+            },
+        ])
+    }
 }
-
-pub fn query_balance(
-    querier: &QuerierWrapper,
-    account_addr: Addr,
-    denom: String,
-) -> StdResult<Uint128> {
-    // load price form the oracle
-    let balance: BalanceResponse = querier.query(&QueryRequest::Bank(BankQuery::Balance {
-        address: account_addr.to_string(),
-        denom,
-    }))?;
-    Ok(balance.amount.amount)
-}
-
-pub fn query_native_token_decimal(
-    deps: Deps,
-    denom: String,
-) -> StdResult<NativeTokenDecimalsResponse> {
-    let decimals = ALLOW_NATIVE_TOKENS.load(deps.storage, denom.as_bytes())?;
-
-    Ok(NativeTokenDecimalsResponse { decimals })
-}
-
-pub fn pair_key(asset_infos: &[AssetInfoRaw; 2]) -> Vec<u8> {
-    let mut asset_infos = asset_infos.to_vec();
-    asset_infos.sort_by(|a, b| a.as_bytes().cmp(b.as_bytes()));
-
-    [asset_infos[0].as_bytes(), asset_infos[1].as_bytes()].concat()
-}
-
-// key : asset info / value: decimals
-// pub const ALLOW_NATIVE_TOKENS: Map<&[u8], u8> = Map::new("allow_native_token");
-pub fn add_allow_native_token(
-    storage: &mut dyn Storage,
-    denom: String,
-    decimals: u8,
-) -> StdResult<()> {
-    ALLOW_NATIVE_TOKENS.save(storage, denom.as_bytes(), &decimals)
-}
-

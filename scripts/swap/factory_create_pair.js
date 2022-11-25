@@ -19,8 +19,8 @@ async function CreatePair(_contract) {
     const gasPrice = GasPrice.fromString(`0.025${chainConfig.denom}`);
     const client = await SigningCosmWasmClient.connectWithSigner(chainConfig.rpcEndpoint, deployerWallet, {gasPrice});
     
-    const tokenAAddress = "aura1smcy8kged97n493cgh6jzrda0hahge4j6qrg0hx2j5tgwy2259hshpxzyv";
-    const tokenBAddress = "aura19xm0cnz5j6m8q6jdt2hyldld8wxpd33cym8s6l99kfnfjh6gcstsk4sjua";
+    const tokenAAddress = "aura1c7fycp5q0ydst0ukgt7sn69utagrpp6374mv4g9t87tg5eeyu4zq9klg6k";
+    const tokenBAddress = "aura1zz8pvrr7qyul7wcucaq0mva056z3f9pr8q2jcqf8qjzqtvtdrt5s7ee6vd";
 
     const memo = "create pair";
     // define the take message using the address of deployer, uri of the nft and permitSignature

@@ -21,11 +21,11 @@ async function instantiate(_codeID) {
 
     const codeId = _codeID;
     //Define the instantiate message
-    const instantiateMsg = {"auraswap_factory":"aura1g8xt7rxmq6h3tq7fd2atux99jurx7qc5w4aua2etjyck0y44mvhsssamyn",};
+    const instantiateMsg = {"halo_factory":"aura1maq9kjdktdeg484syuu04cgzvse27vg5qmlclce9xukh6vn5x3pspj0cnv",};
 
 
     //Instantiate the contract
-    const instantiateResponse = await client.instantiate(account.address, Number(_codeID), instantiateMsg, "Instantiate contract", defaultFee);
+    const instantiateResponse = await client.instantiate(account.address, Number(_codeID), instantiateMsg, "halo Router", defaultFee);
     console.log(instantiateResponse);
 
     // print out the address of the newly created contract
