@@ -37,7 +37,7 @@ async function instantiate(_codeID) {
                         };
 
     //Instantiate the contract
-    const instantiateResponse = await client.instantiate(account.address, Number(_codeID), instantiateMsg, "Instantiate contract", defaultFee);
+    const instantiateResponse = await client.instantiate(account.address, Number(_codeID), instantiateMsg, "AuraSwap Token B", defaultFee);
     console.log(instantiateResponse);
 
     // print out the address of the newly created contract

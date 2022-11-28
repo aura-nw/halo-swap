@@ -1,9 +1,7 @@
 pub mod contract;
-mod error;
-pub mod msg;
-pub mod pair;
-pub mod asset;
-pub mod swap;
-pub mod liquidity;
+pub mod state;
 
-pub use crate::error::ContractError;
+mod error;
+
+#[cfg(test)]
+mod testing;

@@ -24,9 +24,9 @@ async function store() {
     const uploadFee = calculateFee(2500000, gasPrice);
     const account = (await deployerWallet.getAccounts())[0];
 
-    const haloToken = fs.readFileSync(`${__dirname}/../../artifacts/halo_token.wasm`);
-    const haloTokenResponse = await client.upload(account.address, haloToken, uploadFee, 'Upload halo-token contract code');
-    console.log(haloTokenResponse);
+    const auraToken = fs.readFileSync(`${__dirname}/../../artifacts/halo_token.wasm`);
+    const auraTokenResponse = await client.upload(account.address, auraToken, uploadFee, 'Upload halo-token contract code');
+    console.log(auraTokenResponse);
 }
 
 store()

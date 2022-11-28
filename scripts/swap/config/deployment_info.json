@@ -1,26 +1,26 @@
 {
-	"halo_token_A": {
-		"code_id": 713,
-		"address": "aura1smcy8kged97n493cgh6jzrda0hahge4j6qrg0hx2j5tgwy2259hshpxzyv"
+	"aura_token_A": {
+		"code_id": 750,
+		"address": "aura15pp33amcmxd703szqrtp8fvxdsm9kf4jh9x29920qa6x362g04asf62v23"
 	},
-	"halo_token_B": {
-		"code_id": 713,
-		"address": "aura19xm0cnz5j6m8q6jdt2hyldld8wxpd33cym8s6l99kfnfjh6gcstsk4sjua"
+	"aura_token_B": {
+		"code_id": 750,
+		"address": "aura19sqmgzw09qz337wpu7pvu03yvz08s8n4lx89ul657x4kx07mekqs6ysgez"
 	},
-	"halo_pair_1": {
-		"code_id": 727,
-		"address": "aura1ndwa9wfhjzznrtty8wx4w8786399n228y36kp89prtrywn2dzthsev77dz"
+	"aura_pair_1": {
+		"code_id": 751,
+		"address": "aura1wnlxn3l5cellfv4x8xyek2ngzkaj9ejpreyupm4hg396qgweyy6s6q3zrq"
 	},
-	"halo_LP_token_1": {
-		"code_id": 713,
-		"address": "aura19hcxe0sy83e9uxnm7cte2xjykj5egrhn78yp397zrnfet37ex90qk6rlgp"
+	"aura_LP_token_1": {
+		"code_id": 750,
+		"address": "aura1gqgcfgjh4yjq9z98v6r2ek5vtmqp0a42du89age247tr07avt7rs65qfpz"
 	},
-	"halo_factory": {
-		"code_id": 715,
-		"address": "aura1g8xt7rxmq6h3tq7fd2atux99jurx7qc5w4aua2etjyck0y44mvhsssamyn"
+	"aura_factory": {
+		"code_id": 752,
+		"address": "aura1ft7keajm5x7un2h6x9jurw56lk6w03x94m3k25uvlpv6pw3dvt8q7gdd03"
 	},
-	"halo_router": {
-		"code_id": 716,
-		"address": "aura1zfe6x4pqlayrreg6yccqszqaglt7fu8tr9075lcge06kvch6fehqx8luet"
+	"aura_router": {
+		"code_id": 753,
+		"address": "aura1glnpxkrpex9ef83ycg9mnn5n6eu5gxe9wqq7j6tj7qmvnna66f7se8s0nt"
 	}
 }

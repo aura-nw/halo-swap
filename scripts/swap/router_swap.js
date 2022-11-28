@@ -25,20 +25,23 @@ async function swap(_contract) {
 
     const memo = "swap";
 
+    const tokenAAddress = "aura15pp33amcmxd703szqrtp8fvxdsm9kf4jh9x29920qa6x362g04asf62v23";
+    const tokenBAddress = "aura19sqmgzw09qz337wpu7pvu03yvz08s8n4lx89ul657x4kx07mekqs6ysgez";
+
     // define the hook cw20 message
     const hookMsg = {
         "execute_swap_operations": {
             "operations": [
                 {
-                    "aura_swap":{
+                    "halo_swap":{
                         "offer_asset_info": {
                             "token": {
-                                "contract_addr": "aura1smcy8kged97n493cgh6jzrda0hahge4j6qrg0hx2j5tgwy2259hshpxzyv"
+                                "contract_addr": tokenAAddress
                             }
                         },
                         "ask_asset_info": {
                             "token": {
-                                "contract_addr": "aura19xm0cnz5j6m8q6jdt2hyldld8wxpd33cym8s6l99kfnfjh6gcstsk4sjua"
+                                "contract_addr": tokenBAddress
                             }
                         }
                     }
@@ -53,15 +56,16 @@ async function swap(_contract) {
     const executeSendMsg = {
         "send": {
             "contract": _contract,
-            "amount": "1000000000",
+            "amount": "100000000",
             "msg": Buffer.from(JSON.stringify(hookMsg)).toString('base64')
         }
     }
 
     console.log("executeSendMsg: ", executeSendMsg);
 
+    console.log("testerAccount.address: ", testerAccount.address);
     // send the cw20 token to contract
-    const takeResponse = await testerClient.execute(testerAccount.address, "aura1smcy8kged97n493cgh6jzrda0hahge4j6qrg0hx2j5tgwy2259hshpxzyv", executeSendMsg, "auto", memo);
+    const takeResponse = await testerClient.execute(testerAccount.address, tokenAAddress, executeSendMsg, "auto", memo);
 
     console.log(takeResponse);
 }

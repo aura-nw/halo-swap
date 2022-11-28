@@ -22,12 +22,12 @@ async function instantiate(_codeID) {
     const codeId = _codeID;
     //Define the instantiate message
     const instantiateMsg = {
-                            "token_code_id": 713,
-                            "pair_code_id": 727,
+                            "token_code_id": 750,
+                            "pair_code_id": 751,
                         };
 
     //Instantiate the contract
-    const instantiateResponse = await client.instantiate(account.address, Number(_codeID), instantiateMsg, "Instantiate contract", defaultFee);
+    const instantiateResponse = await client.instantiate(account.address, Number(_codeID), instantiateMsg, "halo Factory", defaultFee);
     console.log(instantiateResponse);
 
     // print out the address of the newly created contract
